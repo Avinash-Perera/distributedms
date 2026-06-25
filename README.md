@@ -31,20 +31,13 @@ distributedms/
 
 ## 🛠 How to Run
 
-1. **Start the Infrastructure (Docker)**
+1. **Start Everything (Infrastructure + All 6 Services)**
    ```bash
-   docker compose up -d
+   ./start-all.sh
    ```
-2. **Start the Services (Open 6 Terminal Tabs)**
-   ```bash
-   ./mvnw spring-boot:run -pl api-gateway
-   ./mvnw spring-boot:run -pl order-service
-   ./mvnw spring-boot:run -pl inventory-service
-   ./mvnw spring-boot:run -pl payment-service
-   ./mvnw spring-boot:run -pl fulfillment-service
-   ./mvnw spring-boot:run -pl notification-service
-   ```
-3. **Run the Interactive Tester**
+   *(This boots Postgres, Kafka, Zipkin, Prometheus, and Grafana via Docker, and then launches all 6 Spring Boot applications in the background. Logs are saved in the `/logs` directory).*
+
+2. **Run the Interactive Tester**
    ```bash
    ./test-saga.sh
    ```
