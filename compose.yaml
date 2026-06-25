@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL (The single database server for all services)
+  postgres:
+    image: postgres:16-alpine
+    container_name: saga-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      # We use a trick to create multiple logical databases on startup
+      POSTGRES_MULTIPLE_DATABASES: order_db,inventory_db,payment_db,fulfillment_db
+    volumes:
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
+    networks:
+      - saga-network
+
+  # 2. Apache Kafka (Running in modern KRaft mode, NO ZooKeeper needed!)
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: saga-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - saga-network
+
+  # 3. Kafka UI (Crucial for learning: Visualizes your topics, partitions, and events)
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: saga-kafka-ui
+    ports:
+      - "8088:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka
+    networks:
+      - saga-network
+
+  # 4. Zipkin (For Distributed Tracing observability)
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: saga-zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - saga-network
+
+  # 5. Prometheus (Metrics Scraper)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: saga-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - saga-network
+
+  # 6. Grafana (Metrics Dashboard)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: saga-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - saga-network
+
+networks:
+  saga-network:
+    driver: bridge

@@ -1,0 +1,29 @@
+### Create a new order
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "customerId": "CUST-12345",
+  "customerEmail": "customer@example.com",
+  "productId": "PROD-999"
+}
+
+### Create an order that will FAIL payment (Saga Compensation)
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "customerId": "POOR-GUY",
+  "customerEmail": "poor.guy@example.com",
+  "productId": "PROD-999"
+}
+
+### Create an order that will FAIL fulfillment (Saga Compensation cascade)
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+  "customerId": "BAD-ADDRESS",
+  "customerEmail": "bad.address@example.com",
+  "productId": "PROD-999"
+}
