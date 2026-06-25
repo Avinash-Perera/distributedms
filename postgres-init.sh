@@ -1,13 +1,13 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
-if [ -n "$POSTGRES_MULTIPLE_DATABASES" ]; then
-    echo "Multiple database creation requested: $POSTGRES_MULTIPLE_DATABASES"
-    for db in $(echo $POSTGRES_MULTIPLE_DATABASES | tr ',' ' '); do
-        echo "  Creating user and database '$db'"
-        psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-            CREATE DATABASE $db;
+echo "Creating multiple databases for Saga Pattern POC..."
+
+psql -v ON_ERROR_STOP=1 --username "admin" --dbname "admin" <<-EOSQL
+    CREATE DATABASE order_db;
+    CREATE DATABASE inventory_db;
+    CREATE DATABASE payment_db;
+    CREATE DATABASE fulfillment_db;
 EOSQL
-    done
-    echo "Multiple databases created!"
-fi
+
+echo "Successfully created all 4 databases!"

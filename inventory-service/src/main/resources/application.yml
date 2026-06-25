@@ -5,7 +5,7 @@ spring:
   application:
     name: inventory-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/inventory_db
+    url: jdbc:postgresql://localhost:5433/inventory_db
     username: admin
     password: password
     driver-class-name: org.postgresql.Driver

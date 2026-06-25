@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH=$PATH:/usr/local/bin
 
 # Define colors for the UI
 GREEN='\033[0;32m'
