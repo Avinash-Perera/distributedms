@@ -41,3 +41,7 @@ management:
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
+
+grpc:
+  server:
+    port: 9091

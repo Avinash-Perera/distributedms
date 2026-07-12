@@ -34,46 +34,33 @@
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v3.2.4)
 
-2026-06-25T11:18:08.383+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] c.avinash.gateway.ApiGatewayApplication  : Starting ApiGatewayApplication using Java 21.0.9 with PID 16574 (/Users/avinashperera/distributedms/api-gateway/target/classes started by avinashperera in /Users/avinashperera/distributedms/api-gateway)
-2026-06-25T11:18:08.393+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] c.avinash.gateway.ApiGatewayApplication  : No active profile set, falling back to 1 default profile: "default"
-2026-06-25T11:18:10.899+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.cloud.context.scope.GenericScope     : BeanFactory id=f59864da-10de-3530-a2d5-cb224414e509
-2026-06-25T11:18:12.250+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [After]
-2026-06-25T11:18:12.250+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Before]
-2026-06-25T11:18:12.250+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Between]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Cookie]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Header]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Host]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Method]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Path]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Query]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [ReadBody]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [RemoteAddr]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [XForwardedRemoteAddr]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Weight]
-2026-06-25T11:18:12.251+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [CloudFoundryRouteService]
-2026-06-25T11:18:12.695+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoint(s) beneath base path '/actuator'
-2026-06-25T11:18:13.311+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8080
-2026-06-25T11:18:13.461+05:30  INFO 16574 --- [api-gateway] [           main] [                                                 ] c.avinash.gateway.ApiGatewayApplication  : Started ApiGatewayApplication in 6.118 seconds (process running for 6.866)
-2026-06-25T11:18:43.320+05:30 ERROR 16574 --- [api-gateway] [ctor-http-nio-5] [                                                 ] a.w.r.e.AbstractErrorWebExceptionHandler : [018a32dd-7]  500 Server Error for HTTP POST "/orders"
+2026-07-12T21:36:11.835+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] c.avinash.gateway.ApiGatewayApplication  : Starting ApiGatewayApplication using Java 26.0.1 with PID 44588 (/Users/avinashperera/distributedms/api-gateway/target/classes started by avinashperera in /Users/avinashperera/distributedms/api-gateway)
+2026-07-12T21:36:11.840+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] c.avinash.gateway.ApiGatewayApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-07-12T21:36:12.683+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.cloud.context.scope.GenericScope     : BeanFactory id=f59864da-10de-3530-a2d5-cb224414e509
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by io.netty.util.internal.PlatformDependent0$4 (file:/Users/avinashperera/.m2/repository/io/netty/netty-common/4.1.107.Final/netty-common-4.1.107.Final.jar)
+WARNING: Please consider reporting this to the maintainers of class io.netty.util.internal.PlatformDependent0$4
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+2026-07-12T21:36:13.225+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [After]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Before]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Between]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Cookie]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Header]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Host]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Method]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Path]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Query]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [ReadBody]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [RemoteAddr]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Weight]
+2026-07-12T21:36:13.226+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2026-07-12T21:36:13.390+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-07-12T21:36:13.753+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8080
+2026-07-12T21:36:13.804+05:30  INFO 44588 --- [api-gateway] [           main] [                                                 ] c.avinash.gateway.ApiGatewayApplication  : Started ApiGatewayApplication in 2.449 seconds (process running for 2.719)
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::loadLibrary has been called by io.netty.util.internal.NativeLibraryUtil in an unnamed module (file:/Users/avinashperera/.m2/repository/io/netty/netty-common/4.1.107.Final/netty-common-4.1.107.Final.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
 
-io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: localhost/[0:0:0:0:0:0:0:1]:8081
-	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
-Error has been observed at the following site(s):
-	*__checkpoint ⇢ org.springframework.cloud.gateway.filter.WeightCalculatorWebFilter [DefaultWebFilterChain]
-	*__checkpoint ⇢ HTTP POST "/orders" [ExceptionHandlingWebHandler]
-Original Stack Trace:
-Caused by: java.net.ConnectException: Connection refused
-	at java.base/sun.nio.ch.Net.pollConnect(Native Method) ~[na:na]
-	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:682) ~[na:na]
-	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:973) ~[na:na]
-	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:337) ~[netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:335) ~[netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776) ~[netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724) ~[netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650) ~[netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562) ~[netty-transport-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997) ~[netty-common-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.1.107.Final.jar:4.1.107.Final]
-	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.1.107.Final.jar:4.1.107.Final]
-	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
-
+2026-07-12T21:36:14.967+05:30 ERROR 44588 --- [api-gateway] [ender@3e024ad2}] [                                                 ] i.n.r.d.DnsServerAddressStreamProviders  : Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
