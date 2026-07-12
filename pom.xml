@@ -21,6 +21,7 @@
 	</properties>
 
     <modules>
+        <module>grpc-api</module>
         <module>api-gateway</module>
         <module>order-service</module>
         <module>inventory-service</module>
