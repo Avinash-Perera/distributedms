@@ -42,6 +42,16 @@ distributedms/
    ./test-saga.sh
    ```
 
+3. **Run the gRPC vs REST Performance Benchmark**
+   We have added synchronous gRPC and REST communication between the `order-service` and `inventory-service` purely to benchmark the performance difference in interservice communication. Once the services are running, run these commands to trigger 1000 requests each:
+   ```bash
+   # Test REST latency
+   curl "http://localhost:8081/api/test/rest?count=1000"
+   
+   # Test gRPC latency
+   curl "http://localhost:8081/api/test/grpc?count=1000"
+   ```
+
 ---
 
 ## 📖 Expanding the Architecture: Adding a "Catalog Service"
