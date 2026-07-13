@@ -13,8 +13,23 @@ echo -e "${BLUE}====================================================${NC}"
 echo -e "\n${GREEN}[1/3] Starting Docker Compose Infrastructure...${NC}"
 docker compose up -d
 
-echo -e "\nWaiting 10 seconds for Kafka and Postgres to be fully ready..."
+echo -e "\nWaiting for Kafka and Postgres to be ready..."
 sleep 10
+
+echo -e "\n${GREEN}Waiting for Keycloak to be ready (this can take 30-60s)...${NC}"
+KEYCLOAK_URL="http://localhost:8180/realms/ecommerce-realm/.well-known/openid-configuration"
+MAX_WAIT=120
+WAITED=0
+until curl -s --fail "$KEYCLOAK_URL" > /dev/null 2>&1; do
+  if [ $WAITED -ge $MAX_WAIT ]; then
+    echo "❌ Keycloak did not become ready after ${MAX_WAIT}s. Check: docker logs saga-keycloak"
+    exit 1
+  fi
+  echo "  ⏳ Keycloak not ready yet... retrying in 5s (${WAITED}s elapsed)"
+  sleep 5
+  WAITED=$((WAITED + 5))
+done
+echo "✅ Keycloak is ready!"
 
 echo -e "\n${GREEN}[2/3] Preparing Log Directory...${NC}"
 mkdir -p logs

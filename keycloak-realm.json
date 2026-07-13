@@ -28,7 +28,16 @@
           "value": "password",
           "temporary": false
         }
-      ]
+      ],
+      "realmRoles": ["CUSTOMER"]
     }
-  ]
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "CUSTOMER",
+        "description": "Standard customer who can place and view orders"
+      }
+    ]
+  }
 }

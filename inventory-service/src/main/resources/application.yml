@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: inventory-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/ecommerce-realm
   datasource:
     url: jdbc:postgresql://localhost:5433/inventory_db
     username: admin
@@ -19,6 +24,10 @@ spring:
     defer-datasource-initialization: true
   kafka:
     bootstrap-servers: localhost:9092
+    properties:
+      security.protocol: SASL_PLAINTEXT
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="inventory" password="order-secret";
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

@@ -6,6 +6,10 @@ spring:
     name: notification-service
   kafka:
     bootstrap-servers: localhost:9092
+    properties:
+      security.protocol: SASL_PLAINTEXT
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="notification" password="order-secret";
     consumer:
       group-id: notification-group
       auto-offset-reset: earliest

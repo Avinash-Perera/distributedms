@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -14,6 +15,7 @@ public class InventoryRestController {
     private InventoryRepository inventoryRepository;
 
     @PostMapping("/check")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public InventoryCheckResponse checkInventory(@RequestBody InventoryCheckRequest request) {
         boolean available = inventoryRepository.findById(request.getProductId())
                 .map(inventory -> inventory.getStock() >= request.getQuantity())

@@ -1,4 +1,4 @@
-package com.avinash.order.config;
+package com.avinash.inventory;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity  // enables @PreAuthorize on controllers
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -36,11 +36,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /**
-     * Keycloak puts roles inside: realm_access.roles[]
-     * Spring Security expects: ROLE_CUSTOMER (with ROLE_ prefix)
-     * This converter bridges the gap — without it, @PreAuthorize("hasRole('CUSTOMER')") never works.
-     */
     @Bean
     public JwtAuthenticationConverter keycloakJwtConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
@@ -48,17 +43,12 @@ public class SecurityConfig {
         return converter;
     }
 
-    /**
-     * Reads Keycloak's realm_access.roles claim and maps each role
-     * to a Spring Security GrantedAuthority with the "ROLE_" prefix.
-     */
+    // Reads realm_access.roles from Keycloak JWT and maps to ROLE_XXX authorities
     static class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
         @Override
         public Collection<GrantedAuthority> convert(Jwt jwt) {
             Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-            if (realmAccess == null || !realmAccess.containsKey("roles")) {
-                return List.of();
-            }
+            if (realmAccess == null || !realmAccess.containsKey("roles")) return List.of();
             @SuppressWarnings("unchecked")
             List<String> roles = (List<String>) realmAccess.get("roles");
             return roles.stream()
