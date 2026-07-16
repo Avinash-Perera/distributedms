@@ -1,0 +1,243 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-api-gateway
+  template:
+    metadata:
+      labels:
+        app: saga-api-gateway
+    spec:
+      containers:
+      - name: api-gateway
+        image: distributedms-api-gateway
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+          value: http://keycloak:8180/realms/ecommerce-realm/protocol/openid-connect/certs
+        - name: ORDER_SERVICE_HOST
+          value: saga-order-service
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+          value: http://zipkin:9411/api/v2/spans
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: saga-api-gateway
+spec:
+  type: LoadBalancer
+  selector:
+    app: saga-api-gateway
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-order-service
+  template:
+    metadata:
+      labels:
+        app: saga-order-service
+    spec:
+      containers:
+      - name: order-service
+        image: distributedms-order-service
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8081
+        env:
+        - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+          value: http://keycloak:8180/realms/ecommerce-realm/protocol/openid-connect/certs
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres:5432/order_db
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: kafka:29092
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+          value: http://zipkin:9411/api/v2/spans
+        - name: GRPC_CLIENT_INVENTORY_ADDRESS
+          value: static://saga-inventory-service:9091
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: saga-order-service
+spec:
+  selector:
+    app: saga-order-service
+  ports:
+  - port: 8081
+    targetPort: 8081
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-inventory-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-inventory-service
+  template:
+    metadata:
+      labels:
+        app: saga-inventory-service
+    spec:
+      containers:
+      - name: inventory-service
+        image: distributedms-inventory-service
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8082
+        - containerPort: 9091
+        env:
+        - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI
+          value: http://keycloak:8180/realms/ecommerce-realm/protocol/openid-connect/certs
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres:5432/inventory_db
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: kafka:29092
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+          value: http://zipkin:9411/api/v2/spans
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: saga-inventory-service
+spec:
+  selector:
+    app: saga-inventory-service
+  ports:
+  - name: http
+    port: 8082
+    targetPort: 8082
+  - name: grpc
+    port: 9091
+    targetPort: 9091
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-payment-service
+  template:
+    metadata:
+      labels:
+        app: saga-payment-service
+    spec:
+      containers:
+      - name: payment-service
+        image: distributedms-payment-service
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8083
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres:5432/payment_db
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: kafka:29092
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+          value: http://zipkin:9411/api/v2/spans
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: saga-payment-service
+spec:
+  selector:
+    app: saga-payment-service
+  ports:
+  - port: 8083
+    targetPort: 8083
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-fulfillment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-fulfillment-service
+  template:
+    metadata:
+      labels:
+        app: saga-fulfillment-service
+    spec:
+      containers:
+      - name: fulfillment-service
+        image: distributedms-fulfillment-service
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8084
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://postgres:5432/fulfillment_db
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: kafka:29092
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+          value: http://zipkin:9411/api/v2/spans
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: saga-fulfillment-service
+spec:
+  selector:
+    app: saga-fulfillment-service
+  ports:
+  - port: 8084
+    targetPort: 8084
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-notification-service
+  template:
+    metadata:
+      labels:
+        app: saga-notification-service
+    spec:
+      containers:
+      - name: notification-service
+        image: distributedms-notification-service
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8085
+        env:
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          value: kafka:29092
+        - name: MANAGEMENT_ZIPKIN_TRACING_ENDPOINT
+          value: http://zipkin:9411/api/v2/spans
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: saga-notification-service
+spec:
+  selector:
+    app: saga-notification-service
+  ports:
+  - port: 8085
+    targetPort: 8085

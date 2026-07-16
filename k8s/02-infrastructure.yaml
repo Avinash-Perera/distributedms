@@ -1,0 +1,326 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-postgres
+  template:
+    metadata:
+      labels:
+        app: saga-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: admin
+        - name: POSTGRES_PASSWORD
+          value: password
+        - name: POSTGRES_MULTIPLE_DATABASES
+          value: order_db,inventory_db,payment_db,fulfillment_db
+        volumeMounts:
+        - name: init-script
+          mountPath: /docker-entrypoint-initdb.d/postgres-init.sh
+          subPath: postgres-init.sh
+      volumes:
+      - name: init-script
+        configMap:
+          name: postgres-init-script
+          defaultMode: 0755
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  selector:
+    app: saga-postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-keycloak
+  template:
+    metadata:
+      labels:
+        app: saga-keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: quay.io/keycloak/keycloak:24.0.4
+        command: ["/opt/keycloak/bin/kc.sh", "start-dev", "--import-realm"]
+        ports:
+        - containerPort: 8080
+        env:
+        - name: KC_DB
+          value: postgres
+        - name: KC_DB_URL
+          value: jdbc:postgresql://postgres:5432/postgres
+        - name: KC_DB_USERNAME
+          value: admin
+        - name: KC_DB_PASSWORD
+          value: password
+        - name: KEYCLOAK_ADMIN
+          value: admin
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: admin
+        volumeMounts:
+        - name: realm-config
+          mountPath: /opt/keycloak/data/import/realm.json
+          subPath: realm.json
+      volumes:
+      - name: realm-config
+        configMap:
+          name: keycloak-realm-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+spec:
+  type: LoadBalancer
+  selector:
+    app: saga-keycloak
+  ports:
+  - port: 8180
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-kafka
+  template:
+    metadata:
+      labels:
+        app: saga-kafka
+    spec:
+      containers:
+      - name: kafka
+        image: confluentinc/cp-kafka:7.6.0
+        ports:
+        - containerPort: 9092
+        - containerPort: 29092
+        env:
+        - name: CLUSTER_ID
+          value: MkU3OEVBNTcwNTJENDM2Qk
+        - name: KAFKA_NODE_ID
+          value: "1"
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: CONTROLLER:PLAINTEXT,PLAINTEXT:SASL_PLAINTEXT,PLAINTEXT_HOST:SASL_PLAINTEXT
+        - name: KAFKA_LISTENERS
+          value: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:29093,PLAINTEXT_HOST://0.0.0.0:9092
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+        - name: KAFKA_SASL_ENABLED_MECHANISMS
+          value: PLAIN
+        - name: KAFKA_OPTS
+          value: -Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf
+        - name: KAFKA_PORT
+          value: ""
+        - name: KAFKA_CONTROLLER_LISTENER_NAMES
+          value: CONTROLLER
+        - name: KAFKA_CONTROLLER_QUORUM_VOTERS
+          value: 1@localhost:29093
+        - name: KAFKA_PROCESS_ROLES
+          value: broker,controller
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: "1"
+        - name: KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS
+          value: "0"
+        - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+          value: "1"
+        - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+          value: "1"
+        volumeMounts:
+        - name: jaas-config
+          mountPath: /etc/kafka/kafka_server_jaas.conf
+          subPath: kafka_server_jaas.conf
+      volumes:
+      - name: jaas-config
+        configMap:
+          name: kafka-jaas-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+spec:
+  type: LoadBalancer
+  selector:
+    app: saga-kafka
+  ports:
+  - name: internal
+    port: 29092
+    targetPort: 29092
+  - name: external
+    port: 9092
+    targetPort: 9092
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-kafka-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-kafka-ui
+  template:
+    metadata:
+      labels:
+        app: saga-kafka-ui
+    spec:
+      containers:
+      - name: kafka-ui
+        image: provectuslabs/kafka-ui:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: KAFKA_CLUSTERS_0_NAME
+          value: local
+        - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+          value: kafka:29092
+        - name: KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL
+          value: SASL_PLAINTEXT
+        - name: KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM
+          value: PLAIN
+        - name: KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG
+          value: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui
+spec:
+  type: LoadBalancer
+  selector:
+    app: saga-kafka-ui
+  ports:
+  - port: 8088
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-zipkin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-zipkin
+  template:
+    metadata:
+      labels:
+        app: saga-zipkin
+    spec:
+      containers:
+      - name: zipkin
+        image: openzipkin/zipkin
+        ports:
+        - containerPort: 9411
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zipkin
+spec:
+  type: LoadBalancer
+  selector:
+    app: saga-zipkin
+  ports:
+  - port: 9411
+    targetPort: 9411
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-prometheus
+  template:
+    metadata:
+      labels:
+        app: saga-prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus:latest
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - name: prom-config
+          mountPath: /etc/prometheus/prometheus.yml
+          subPath: prometheus.yml
+      volumes:
+      - name: prom-config
+        configMap:
+          name: prometheus-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+spec:
+  type: LoadBalancer
+  selector:
+    app: saga-prometheus
+  ports:
+  - port: 9090
+    targetPort: 9090
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: saga-grafana
+  template:
+    metadata:
+      labels:
+        app: saga-grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: admin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+spec:
+  type: LoadBalancer
+  selector:
+    app: saga-grafana
+  ports:
+  - port: 3000
+    targetPort: 3000

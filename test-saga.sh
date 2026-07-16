@@ -39,10 +39,27 @@ case $choice in
     ;;
 esac
 
-echo -e "\n${BLUE}➤ Step 1: Client sends POST request to API Gateway (Port 8080)...${NC}"
+echo -e "\n${BLUE}➤ Step 1a: Authenticating with Keycloak to get JWT token...${NC}"
+TOKEN_RESPONSE=$(curl -s -X POST "http://localhost:8180/realms/ecommerce-realm/protocol/openid-connect/token" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "client_id=api-gateway-client" \
+  -d "username=testuser" \
+  -d "password=password" \
+  -d "grant_type=password")
+
+ACCESS_TOKEN=$(echo "$TOKEN_RESPONSE" | grep -o '"access_token":"[^"]*' | cut -d'"' -f4)
+
+if [ -z "$ACCESS_TOKEN" ]; then
+  echo -e "${RED}Failed to authenticate with Keycloak! Is Keycloak running?${NC}"
+  exit 1
+fi
+echo -e "${GREEN}✅ Successfully obtained JWT token!${NC}"
+
+echo -e "\n${BLUE}➤ Step 1b: Client sends securely authenticated POST request to API Gateway (Port 8080)...${NC}"
 sleep 1
 RESPONSE=$(curl -s -X POST http://localhost:8080/orders \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
   -d '{
     "customerId": "'$CUST'",
     "customerEmail": "tester@example.com",

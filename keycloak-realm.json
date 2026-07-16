@@ -22,6 +22,8 @@
       "enabled": true,
       "emailVerified": true,
       "email": "testuser@ecommerce.local",
+      "firstName": "Test",
+      "lastName": "User",
       "credentials": [
         {
           "type": "password",

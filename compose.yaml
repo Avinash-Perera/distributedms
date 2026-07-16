@@ -114,6 +114,119 @@ services:
     networks:
       - saga-network
 
+  api-gateway:
+    build:
+      context: .
+      args:
+        MODULE: api-gateway
+    container_name: saga-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/ecommerce-realm/protocol/openid-connect/certs
+      ORDER_SERVICE_HOST: order-service
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - keycloak
+      - order-service
+    networks:
+      - saga-network
+
+  order-service:
+    build:
+      context: .
+      args:
+        MODULE: order-service
+    container_name: saga-order-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/ecommerce-realm/protocol/openid-connect/certs
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/order_db
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      GRPC_CLIENT_INVENTORY_ADDRESS: 'static://inventory-service:9091'
+    depends_on:
+      - postgres
+      - kafka
+      - keycloak
+      - inventory-service
+    networks:
+      - saga-network
+
+  inventory-service:
+    build:
+      context: .
+      args:
+        MODULE: inventory-service
+    container_name: saga-inventory-service
+    ports:
+      - "8082:8082"
+      - "9091:9091"
+    environment:
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/ecommerce-realm/protocol/openid-connect/certs
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inventory_db
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - postgres
+      - kafka
+      - keycloak
+    networks:
+      - saga-network
+
+  payment-service:
+    build:
+      context: .
+      args:
+        MODULE: payment-service
+    container_name: saga-payment-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/payment_db
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - saga-network
+
+  fulfillment-service:
+    build:
+      context: .
+      args:
+        MODULE: fulfillment-service
+    container_name: saga-fulfillment-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fulfillment_db
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - postgres
+      - kafka
+    networks:
+      - saga-network
+
+  notification-service:
+    build:
+      context: .
+      args:
+        MODULE: notification-service
+    container_name: saga-notification-service
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      - kafka
+    networks:
+      - saga-network
+
 networks:
   saga-network:
     driver: bridge

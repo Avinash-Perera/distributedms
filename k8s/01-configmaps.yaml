@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-realm-config
+data:
+  realm.json: |
+    {
+      "id": "ecommerce-realm",
+      "realm": "ecommerce-realm",
+      "enabled": true,
+      "sslRequired": "none",
+      "registrationAllowed": false,
+      "clients": [
+        {
+          "clientId": "api-gateway-client",
+          "enabled": true,
+          "publicClient": true,
+          "directAccessGrantsEnabled": true,
+          "standardFlowEnabled": true,
+          "redirectUris": ["*"],
+          "webOrigins": ["*"],
+          "protocol": "openid-connect"
+        }
+      ],
+      "users": [
+        {
+          "username": "testuser",
+          "enabled": true,
+          "emailVerified": true,
+          "email": "testuser@ecommerce.local",
+          "firstName": "Test",
+          "lastName": "User",
+          "credentials": [
+            {
+              "type": "password",
+              "value": "password",
+              "temporary": false
+            }
+          ],
+          "realmRoles": ["CUSTOMER"]
+        }
+      ],
+      "roles": {
+        "realm": [
+          {
+            "name": "CUSTOMER",
+            "description": "Standard customer who can place and view orders"
+          }
+        ]
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-jaas-config
+data:
+  kafka_server_jaas.conf: |
+    KafkaServer {
+      org.apache.kafka.common.security.plain.PlainLoginModule required
+      username="admin"
+      password="admin-secret"
+      user_admin="admin-secret"
+      user_order="order-secret"
+      user_inventory="order-secret"
+      user_payment="order-secret"
+      user_fulfillment="order-secret"
+      user_notification="order-secret";
+    };
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 5s
+
+    scrape_configs:
+      - job_name: 'spring-boot-services'
+        metrics_path: '/actuator/prometheus'
+        static_configs:
+          - targets:
+            - 'saga-api-gateway:8080' # API Gateway
+            - 'saga-order-service:8081' # Order Service
+            - 'saga-inventory-service:8082' # Inventory Service
+            - 'saga-payment-service:8083' # Payment Service
+            - 'saga-fulfillment-service:8084' # Fulfillment Service
+            - 'saga-notification-service:8085' # Notification Service
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-script
+data:
+  postgres-init.sh: |
+    #!/bin/sh
+    set -e
+
+    echo "Creating multiple databases for Saga Pattern POC..."
+
+    psql -v ON_ERROR_STOP=1 --username "admin" --dbname "postgres" <<-EOSQL
+        CREATE DATABASE order_db;
+        CREATE DATABASE inventory_db;
+        CREATE DATABASE payment_db;
+        CREATE DATABASE fulfillment_db;
+    EOSQL
+
+    echo "Successfully created all 4 databases!"

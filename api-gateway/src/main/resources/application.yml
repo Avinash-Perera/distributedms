@@ -8,12 +8,12 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8180/realms/ecommerce-realm
+          jwk-set-uri: http://localhost:8180/realms/ecommerce-realm/protocol/openid-connect/certs
   cloud:
     gateway:
       routes:
         - id: order-service
-          uri: http://localhost:8081
+          uri: http://${ORDER_SERVICE_HOST:localhost}:8081
           predicates:
             - Path=/orders/**
           filters:
