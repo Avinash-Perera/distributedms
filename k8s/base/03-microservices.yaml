@@ -16,6 +16,25 @@ spec:
       - name: api-gateway
         image: distributedms-api-gateway
         imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
         ports:
         - containerPort: 8080
         env:
@@ -56,6 +75,25 @@ spec:
       - name: order-service
         image: distributedms-order-service
         imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 10
         ports:
         - containerPort: 8081
         env:
@@ -99,6 +137,25 @@ spec:
       - name: inventory-service
         image: distributedms-inventory-service
         imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8082
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8082
+          initialDelaySeconds: 15
+          periodSeconds: 10
         ports:
         - containerPort: 8082
         - containerPort: 9091
@@ -145,6 +202,25 @@ spec:
       - name: payment-service
         image: distributedms-payment-service
         imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8083
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8083
+          initialDelaySeconds: 15
+          periodSeconds: 10
         ports:
         - containerPort: 8083
         env:
@@ -184,6 +260,25 @@ spec:
       - name: fulfillment-service
         image: distributedms-fulfillment-service
         imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8084
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8084
+          initialDelaySeconds: 15
+          periodSeconds: 10
         ports:
         - containerPort: 8084
         env:
@@ -223,6 +318,25 @@ spec:
       - name: notification-service
         image: distributedms-notification-service
         imagePullPolicy: Never
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8085
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8085
+          initialDelaySeconds: 15
+          periodSeconds: 10
         ports:
         - containerPort: 8085
         env:

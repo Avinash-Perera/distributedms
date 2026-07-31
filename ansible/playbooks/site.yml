@@ -1,0 +1,67 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install dependencies
+      apt:
+        name:
+          - curl
+          - apt-transport-https
+          - ca-certificates
+          - software-properties-common
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: Ensure Docker is started and enabled
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+- hosts: master
+  become: yes
+  tasks:
+    - name: Install K3s server
+      shell: curl -sfL https://get.k3s.io | sh -s - server --node-ip=192.168.50.10
+      args:
+        creates: /etc/rancher/k3s/k3s.yaml
+
+    - name: Get K3s node token
+      slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: node_token
+
+    - name: Set fact for K3s token
+      set_fact:
+        k3s_token: "{{ node_token['content'] | b64decode | trim }}"
+
+- hosts: worker
+  become: yes
+  tasks:
+    - name: Install K3s agent
+      shell: >
+        curl -sfL https://get.k3s.io | K3S_URL=https://192.168.50.10:6443 K3S_TOKEN={{ hostvars[groups['master'][0]]['k3s_token'] }} sh -s - --node-ip={{ inventory_hostname }}
+      args:
+        creates: /etc/systemd/system/k3s-agent.service
