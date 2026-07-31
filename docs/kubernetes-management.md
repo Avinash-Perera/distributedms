@@ -26,12 +26,14 @@ kubectl delete -k k8s/overlays/dev
 kubectl delete namespace argocd
 ```
 
-### 🧹 Freeing Up Disk Space (Docker Images)
-Docker caches every image you build. To recover gigabytes of disk space by deleting unused images, run:
+### 🧹 Freeing Up Disk Space (Safer Docker Cleanup)
+If you want to free up disk space but **KEEP** the microservice images you just built so you don't have to rebuild them later, run this safe command:
 ```bash
-docker system prune -a --volumes
+docker image prune
 ```
-*(Warning: This deletes all stopped containers and unused images. The next time you build, it will have to download dependencies again).*
+*(This only deletes temporary/dangling junk images, but protects your tagged microservices).*
+
+If you ever want to completely wipe **everything** on Docker (including your project images), you would use `docker system prune -a`, but only do that if you are okay with rebuilding!
 
 ---
 
